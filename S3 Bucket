@@ -1,0 +1,26 @@
+YAML CloudFormation template that creates an S3 bucket
+========================================================================================================================================
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation Template to create an S3 bucket.
+
+Resources:
+  MyS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: my-unique-bucket-name
+      AccessControl: Private
+
+Outputs:
+  BucketName:
+    Description: Name of the created S3 bucket
+    Value: !Ref MyS3Bucket
+
+=========================================================================================================================================
+
+In this template:
+
+--MyS3Bucket is defined as a AWS::S3::Bucket resource.
+--The BucketName property specifies a unique name for the S3 bucket. Make sure to replace my-unique-bucket-name with a name that is globally unique.
+--The AccessControl property is set to Private, which means that only the bucket owner has access to the objects stored in the bucket.
+--An output named BucketName is defined to display the name of the created S3 bucket.
