@@ -1,0 +1,59 @@
+YAML CloudFormation template that creates an S3 bucket with various configurations such as bucket policies, versioning, CORS configurations, and logging..
+=========================================================================================================================================
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation Template to create an S3 bucket with configurations.
+
+Resources:
+  MyS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: my-unique-bucket-name
+      AccessControl: Private
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - "*"
+            AllowedMethods:
+              - GET
+              - PUT
+              - POST
+              - DELETE
+            AllowedOrigins:
+              - "*"
+      LoggingConfiguration:
+        DestinationBucketName: my-log-bucket
+        LogFilePrefix: logs/
+      
+  MyBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref MyS3Bucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: s3:GetObject
+            Resource: !Sub arn:aws:s3:::${MyS3Bucket}/*
+
+
+Please replace placeholders like my-unique-bucket-name and my-log-bucket with your desired bucket names. Also, keep in mind that setting up public read access to all objects (as shown in the bucket policy) should be carefully considered based on your security requirements.
+
+=========================================================================================================================================
+
+In this template:
+
+--MyS3Bucket is created with various configurations:
+--AccessControl is set to Private.
+--BucketEncryption enables default server-side encryption with AES256.
+--VersioningConfiguration enables versioning for the bucket.
+--CorsConfiguration sets up Cross-Origin Resource Sharing rules.
+--LoggingConfiguration configures access logs to be stored in the specified log bucket with a given prefix.
+--MyBucketPolicy defines a bucket policy allowing public read access to the objects in the bucket.
