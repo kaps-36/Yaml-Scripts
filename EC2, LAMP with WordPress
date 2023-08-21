@@ -1,0 +1,70 @@
+YAML CloudFormation template that creates an EC2 instance with a LAMP stack and installs WordPress...
+==================================================================================================================================
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation Template to create EC2 instance with WordPress.
+
+Resources:
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-12345678  # Replace with your desired Amazon Linux AMI
+      KeyName: my-key-pair
+      SecurityGroupIds:
+        - !Ref MySecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install -y httpd mysql-server php php-mysql
+
+          service httpd start
+          service mysqld start
+          chkconfig httpd on
+          chkconfig mysqld on
+
+          # Configure MySQL for WordPress
+          mysql -e "CREATE DATABASE wordpress;"
+          mysql -e "CREATE USER 'wordpress'@'localhost' IDENTIFIED BY 'your-password';"
+          mysql -e "GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpress'@'localhost';"
+          mysql -e "FLUSH PRIVILEGES;"
+
+          # Download and install WordPress
+          cd /var/www/html
+          wget https://wordpress.org/latest.tar.gz
+          tar -xzf latest.tar.gz
+          rm -f latest.tar.gz
+          cp -r wordpress/* .
+          rm -rf wordpress
+          chown -R apache:apache *
+
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for EC2 Instance
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+Outputs:
+  PublicIP:
+    Description: Public IP address of the EC2 instance
+    Value: !GetAtt MyInstance.PublicIp
+
+Remember to replace placeholders like ami-12345678, my-key-pair, and your-password with your specific values. Also, make sure to secure your MySQL database and WordPress installation further for production use.
+=====================================================================================================================================
+
+In this template:
+
+The user data script installs the LAMP stack (Apache, MySQL, PHP).
+MySQL is configured to create a database for WordPress and a user with privileges.
+WordPress is downloaded, extracted, and moved to the appropriate directory.
+Ownership of WordPress files is changed to the Apache user for proper permissions.
+Security group rules allow inbound traffic on ports 80 (HTTP) and 22 (SSH).
