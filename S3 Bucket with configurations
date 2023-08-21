@@ -44,7 +44,7 @@ Resources:
             Resource: !Sub arn:aws:s3:::${MyS3Bucket}/*
 
 
-Please replace placeholders like my-unique-bucket-name and my-log-bucket with your desired bucket names. Also, keep in mind that setting up public read access to all objects (as shown in the bucket policy) should be carefully considered based on your security requirements.
+Please replace placeholders like my-unique-bucket-name and my-log-bucket with your desired bucket names. Also, Keep in mind that using "Principal": "*" allows public access. If you intend to keep the bucket contents private, you should specify the specific principals (IAM users, roles, etc.) that should have access, rather than using "Principal": "*".
 
 =========================================================================================================================================
 
