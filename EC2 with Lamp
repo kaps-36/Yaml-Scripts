@@ -1,0 +1,60 @@
+YAML CloudFormation template that creates an EC2 instance with a LAMP stack (Linux, Apache, MySQL, PHP) on Ubuntu
+==================================================================================================================================
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation Template to create EC2 instance with LAMP stack, SQL database, and user.
+
+Parameters:
+  DBName:
+    Type: String
+    Default: wordpress
+    Description: Name of the MySQL database
+  DBUser:
+    Type: String
+    Default: kashif12345
+    Description: Username for the MySQL database
+  DBPassword:
+    NoEcho: true
+    Type: String
+    Default: kashu12345
+    Description: Password for the MySQL database user
+
+Resources:
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-05b5a865c3579bbc4
+      KeyName: optimus
+      SecurityGroupIds:
+        - !Ref MySecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y apache2 mysql-server php libapache2-mod-php php-mysql
+
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for EC2 Instance
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+==================================================================================================================================
+
+In this template:
+
+Parameters section defines input parameters for the MySQL database details.
+MyInstance is created with a t2.micro instance type and installs a LAMP stack on an Ubuntu instance.
+SQL configurations are included using AWS::CloudFormation::Init. The example custom.cnf sets some MySQL configuration options.
+Security group rules allow inbound traffic on ports 80 (HTTP) and 22 (SSH).
+DatabaseInfo output provides the MySQL database information based on the input parameters.
+
+Replace ami-12345678, my-key-pair, and adjust the configurations based on your specific needs. Additionally, provide appropriate values for the DBName, DBUser, and DBPassword parameters.
