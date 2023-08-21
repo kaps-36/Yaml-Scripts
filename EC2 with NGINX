@@ -1,0 +1,40 @@
+YAML CloudFormation template with NGINX USER DATA
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation Template to create EC2 instance with NGINX.
+
+Resources:
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-12345678  # Replace with your desired Amazon Linux AMI
+      KeyName: my-key-pair   # Replace with your desired KEY-PAIR
+      SecurityGroupIds:
+        - !Ref MySecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          amazon-linux-extras install nginx1.12 -y
+          service nginx start
+          chkconfig nginx on
+
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for EC2 Instance
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+Outputs:
+  PublicIP:
+    Description: Public IP address of the EC2 instance
+    Value: !GetAtt MyInstance.PublicIp
