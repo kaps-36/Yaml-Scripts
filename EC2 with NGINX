@@ -1,5 +1,5 @@
 YAML CloudFormation template with NGINX USER DATA
-
+======================================================================================================================================
 AWSTemplateFormatVersion: '2010-09-09'
 Description: AWS CloudFormation Template to create EC2 instance with NGINX.
 
@@ -38,3 +38,13 @@ Outputs:
   PublicIP:
     Description: Public IP address of the EC2 instance
     Value: !GetAtt MyInstance.PublicIp
+
+Remember to replace the placeholder values like ami-12345678 with the appropriate Amazon Machine Image (AMI) ID and update the KeyName to your existing SSH key pair.
+
+======================================================================================================================================
+
+In this template:
+
+The user data script is updated to install NGINX and start the NGINX service.
+The amazon-linux-extras install nginx1.12 -y command installs NGINX using the Amazon Linux Extra Packages.
+The service nginx start command starts the NGINX service, and chkconfig nginx on ensures that NGINX starts on system boot.
