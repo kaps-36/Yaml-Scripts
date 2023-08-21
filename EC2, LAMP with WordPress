@@ -1,44 +1,78 @@
 YAML CloudFormation template that creates an EC2 instance with a LAMP stack and installs WordPress...
 ==================================================================================================================================
 
-AWSTemplateFormatVersion: '2010-09-09'
-Description: AWS CloudFormation Template to create EC2 instance with WordPress.
-
+A---
+AWSTemplateFormatVersion: 2010-09-09
+Description: AWS CloudFormation Template to create EC2 instance with LAMP stack,
+  SQL database, and WordPress.
+Parameters:
+  DBName:
+    Type: String
+    Default: mydatabase
+    Description: Name of the MySQL database
+  DBUser:
+    Type: String
+    Default: myuser
+    Description: Username for the MySQL database
+  DBPassword:
+    NoEcho: true
+    Type: String
+    Description: Password for the MySQL database user
 Resources:
   MyInstance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
-      ImageId: ami-12345678  # Replace with your desired Amazon Linux AMI
-      KeyName: my-key-pair
+      ImageId: ami-05b5a865c3579bbc4
+      KeyName: optimus
       SecurityGroupIds:
-        - !Ref MySecurityGroup
+        - MySecurityGroup
       UserData:
-        Fn::Base64: !Sub |
+        Fn::Base64: >
           #!/bin/bash
-          yum update -y
-          yum install -y httpd mysql-server php php-mysql
 
-          service httpd start
-          service mysqld start
-          chkconfig httpd on
-          chkconfig mysqld on
+          apt-get update
 
-          # Configure MySQL for WordPress
-          mysql -e "CREATE DATABASE wordpress;"
-          mysql -e "CREATE USER 'wordpress'@'localhost' IDENTIFIED BY 'your-password';"
-          mysql -e "GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpress'@'localhost';"
-          mysql -e "FLUSH PRIVILEGES;"
+          DEBIAN_FRONTEND=noninteractive apt-get install -y apache2 mysql-server php libapache2-mod-php php-mysql
+
+
+          # Secure MySQL installation
+
+          mysql_secure_installation <<EOF
+
+
+          y
+
+          ${DBPassword}
+
+          ${DBPassword}
+
+          y
+
+          y
+
+          y
+
+          y
+
+          EOF
+
 
           # Download and install WordPress
-          cd /var/www/html
-          wget https://wordpress.org/latest.tar.gz
-          tar -xzf latest.tar.gz
-          rm -f latest.tar.gz
-          cp -r wordpress/* .
-          rm -rf wordpress
-          chown -R apache:apache *
 
+          cd /var/www/html
+
+          wget https://wordpress.org/latest.tar.gz
+
+          tar -xzf latest.tar.gz
+
+          rm -f latest.tar.gz
+
+          cp -r wordpress/* .
+
+          rm -rf wordpress
+
+          chown -R www-data:www-data *
   MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -52,11 +86,6 @@ Resources:
           FromPort: 22
           ToPort: 22
           CidrIp: 0.0.0.0/0
-
-Outputs:
-  PublicIP:
-    Description: Public IP address of the EC2 instance
-    Value: !GetAtt MyInstance.PublicIp
 
 Remember to replace placeholders like ami-12345678, my-key-pair, and your-password with your specific values. Also, make sure to secure your MySQL database and WordPress installation further for production use.
 =====================================================================================================================================
