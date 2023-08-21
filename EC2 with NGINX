@@ -16,9 +16,8 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash
           yum update -y
-          amazon-linux-extras install nginx1.12 -y
-          service nginx start
-          chkconfig nginx on
+          sudo amazon-linux-extras install nginx1
+
 
   MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
